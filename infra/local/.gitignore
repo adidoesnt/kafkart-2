@@ -1,0 +1,7 @@
+# Solace
+solace-data
+solace-data/*
+
+# Postgres
+postgres-data
+postgres-data/*
