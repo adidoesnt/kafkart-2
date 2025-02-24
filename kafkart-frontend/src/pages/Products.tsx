@@ -2,6 +2,7 @@ import { Layout } from "@/components/Layout";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/context/auth";
 import { productApiClient } from "@/utils/apiClient";
+import { publishProductView } from "@/utils/solace";
 import { getStockBadge } from "@/utils/stock";
 import { useCallback, useEffect, useState } from "react";
 
@@ -19,7 +20,7 @@ export const ProductCard = ({ product }: { product: Product }) => {
 	const { user } = useAuth();
 
 	const onClick = async () => {
-		console.log("Click event", { user, product });
+		await publishProductView(user!.id, product.id);
 	};
 
 	return (
