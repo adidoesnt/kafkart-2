@@ -69,6 +69,12 @@
 			<artifactId>jbcrypt</artifactId>
 			<version>0.4</version>
 		</dependency>
+
+		<dependency>
+			<groupId>com.solacesystems</groupId>
+			<artifactId>sol-jms</artifactId>
+			<version>10.25.2</version>
+		</dependency>
 	</dependencies>
 
 	<build>
