@@ -19,7 +19,7 @@ type CartContextType = {
     removeFromCart: (productId: number) => void;
     clearCart: () => void;
     getProductQuantity: (productId: number) => number;
-    getTotalPrice: () => string;
+    getTotalPrice: () => number;
     checkout: () => Promise<void>;
 }
 
@@ -58,8 +58,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     }, [items]);
 
     const getTotalPrice = useCallback(() => {
-        const totalPrice = items.reduce((acc, item) => acc + item.quantity * item.productId, 0);
-        return totalPrice.toFixed(2);
+        return items.reduce((acc, item) => acc + item.quantity * item.productId, 0);
     }, [items]);
 
     const checkout = useCallback(async () => {

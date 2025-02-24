@@ -1,8 +1,9 @@
 package me.adityabanerjee.kafkart_backend.utils;
 
-public class ProductViewMessageBody implements Processable {
+public class ProductAddToCartMessageBody implements Processable {
     public int userId;
     public int productId;
+    public int quantity;
     public long timestamp;
 
     public void process() {
@@ -10,6 +11,6 @@ public class ProductViewMessageBody implements Processable {
     }
 
     public String toString() {
-        return "{ " + "userId: " + userId + ", " + "productId: " + productId + ", " + "timestamp: " + timestamp + " }";
+        return "{ " + "userId: " + userId + ", " + "productId: " + productId + ", " + "quantity: " + quantity + ", " + "timestamp: " + timestamp + " }";
     }
 }

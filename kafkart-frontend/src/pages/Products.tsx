@@ -2,7 +2,7 @@ import { Layout } from "@/components/Layout";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/context/auth";
 import { productApiClient } from "@/utils/apiClient";
-import { publishProductView } from "@/utils/solace";
+import { publishProductAddToCart, publishProductView } from "@/utils/solace";
 import { getStockBadge } from "@/utils/stock";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
@@ -33,13 +33,15 @@ export type ProductPopupProps = {
 };
 
 export const ProductPopup = ({ product, isOpen, setIsOpen }: ProductPopupProps) => {
+	const { user } = useAuth();
 	const { addToCart, getProductQuantity } = useCart();
 	const [quantity, setQuantity] = useState(1);
 
 	const onClick = useCallback(() => {
-		addToCart(product.id, quantity)
+		addToCart(product.id, quantity);
+		publishProductAddToCart(user!.id, product.id, quantity);
 		setIsOpen(false);
-	}, [addToCart, product, quantity, setIsOpen]);
+	}, [addToCart, product, quantity, setIsOpen, user]);
 
 	const maxQuantity = useMemo(() => product.stock - getProductQuantity(product.id), [product, getProductQuantity]);
 

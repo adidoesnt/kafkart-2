@@ -22,6 +22,7 @@ public class SolaceConsumer {
     private static final String PASSWORD = "password";
     private static final String VPN_NAME = "default";
     private static final String PRODUCT_VIEW_TOPIC = "product/view";
+    private static final String ADD_TO_CART_TOPIC = "product/add-to-cart";
 
     public SolaceConsumer() {
         this.session = null;
@@ -79,7 +80,24 @@ public class SolaceConsumer {
                     }
                 });
 
-                logger.info("Successfully set message listener.");
+                Topic addToCartTopic = session.createTopic(ADD_TO_CART_TOPIC);
+                MessageConsumer addToCartConsumer = session.createConsumer(addToCartTopic);
+
+                logger.info("Setting message listener...");
+                addToCartConsumer.setMessageListener(message -> {
+                    try {
+                        String json = getRawJson(message);
+
+                        ObjectMapper objectMapper = new ObjectMapper();
+                        ProductAddToCartMessageBody parsedData = objectMapper.readValue(json, ProductAddToCartMessageBody.class);
+
+                        parsedData.process();
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                });
+
+                logger.info("Successfully set message listeners.");
                 return session;
             } catch (Exception e) {
                 logger.error(e.getMessage());
