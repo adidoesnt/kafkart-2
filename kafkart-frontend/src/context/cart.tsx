@@ -18,6 +18,7 @@ type CartContextType = {
     addToCart: (productId: number, quantity: number) => void;
     removeFromCart: (productId: number) => void;
     clearCart: () => void;
+    getProductQuantity: (productId: number) => number;
 }
 
 const CartContext = createContext<CartContextType | null>(null);
@@ -49,11 +50,17 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
         setItems([]);
     }, []);
 
+    const getProductQuantity = useCallback((productId: number) => {
+        const quantity = items.find((item) => item.productId === productId)?.quantity;
+        return quantity ?? 0;
+    }, [items]);
+
     const cartContext = {
         items: items,
         addToCart,
         removeFromCart,
         clearCart,
+        getProductQuantity,
     };
 
     return (

@@ -4,7 +4,7 @@ import { useAuth } from "@/context/auth";
 import { productApiClient } from "@/utils/apiClient";
 import { publishProductView } from "@/utils/solace";
 import { getStockBadge } from "@/utils/stock";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
 	Card,
 	CardContent,
@@ -14,6 +14,7 @@ import {
 	CardTitle,
 } from "@/components/ui/card"
 import { useCart } from "@/context/cart";
+import { Input } from "@/components/ui/input";
 
 export type Product = {
 	id: number;
@@ -32,13 +33,15 @@ export type ProductPopupProps = {
 };
 
 export const ProductPopup = ({ product, isOpen, setIsOpen }: ProductPopupProps) => {
-	const { addToCart } = useCart();
-	const { user } = useAuth();
+	const { addToCart, getProductQuantity } = useCart();
+	const [quantity, setQuantity] = useState(1);
 
 	const onClick = useCallback(() => {
-		addToCart(product.id, user!.id)
+		addToCart(product.id, quantity)
 		setIsOpen(false);
-	}, [addToCart, product, user, setIsOpen]);
+	}, [addToCart, product, quantity, setIsOpen]);
+
+	const maxQuantity = useMemo(() => product.stock - getProductQuantity(product.id), [product, getProductQuantity]);
 
 	return isOpen && (
 		<div className="absolute top-0 left-0 w-full h-full bg-black/50 flex flex-col items-center justify-center">
@@ -58,9 +61,12 @@ export const ProductPopup = ({ product, isOpen, setIsOpen }: ProductPopupProps) 
 						<p className="text-sm font-semibold">Price: ${product.price}</p>
 					</div>
 				</CardContent>
-				<CardFooter className="flex w-full items-center justify-between">
+				<CardFooter className="flex w-full items-center justify-between gap-4">
 					<Button variant={"secondary"} onClick={setIsOpen.bind(null, false)}>Cancel</Button>
-					<Button onClick={onClick} disabled={product.stock === 0}>Add to cart</Button>
+					<div className="flex w-full justify-end items-center gap-2">
+						<Button onClick={onClick} disabled={maxQuantity === 0}>Add to cart</Button>
+						<Input className="border-none w-fit bg-gray-400 text-black" placeholder="Quantity" type="number" max={maxQuantity} min={1} value={quantity} onChange={(e) => setQuantity(Number(e.target.value))} />
+					</div>
 				</CardFooter>
 			</Card>
 		</div>
