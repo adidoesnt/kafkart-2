@@ -7,7 +7,6 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/products")
-@CrossOrigin(origins = "*")
 public class ProductController {
     private final ProductRepository repository;
 
