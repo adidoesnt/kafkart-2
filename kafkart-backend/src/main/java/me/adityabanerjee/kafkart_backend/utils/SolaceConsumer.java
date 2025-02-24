@@ -23,9 +23,14 @@ public class SolaceConsumer {
     private static final String VPN_NAME = "default";
     private static final String PRODUCT_VIEW_TOPIC = "product/view";
     private static final String ADD_TO_CART_TOPIC = "product/add-to-cart";
+    private static final String CHECKOUT_TOPIC = "checkout";
+
+    private ObjectMapper objectMapper;
 
     public SolaceConsumer() {
+
         this.session = null;
+        this.objectMapper = new ObjectMapper();
     }
 
     private String getRawJson(Message message) throws UnsupportedEncodingException, JMSException {
@@ -66,12 +71,10 @@ public class SolaceConsumer {
                 Topic productViewTopic = session.createTopic(PRODUCT_VIEW_TOPIC);
                 MessageConsumer productViewConsumer = session.createConsumer(productViewTopic);
 
-                logger.info("Setting message listener...");
+                logger.info("Setting \"product view\" message listener...");
                 productViewConsumer.setMessageListener(message -> {
                     try {
                         String json = getRawJson(message);
-
-                        ObjectMapper objectMapper = new ObjectMapper();
                         ProductViewMessageBody parsedData = objectMapper.readValue(json, ProductViewMessageBody.class);
 
                         parsedData.process();
@@ -83,13 +86,26 @@ public class SolaceConsumer {
                 Topic addToCartTopic = session.createTopic(ADD_TO_CART_TOPIC);
                 MessageConsumer addToCartConsumer = session.createConsumer(addToCartTopic);
 
-                logger.info("Setting message listener...");
+                logger.info("Setting \"add to cart\" message listener...");
                 addToCartConsumer.setMessageListener(message -> {
                     try {
                         String json = getRawJson(message);
-
-                        ObjectMapper objectMapper = new ObjectMapper();
                         ProductAddToCartMessageBody parsedData = objectMapper.readValue(json, ProductAddToCartMessageBody.class);
+
+                        parsedData.process();
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                });
+
+                Topic checkoutTopic = session.createTopic(CHECKOUT_TOPIC);
+                MessageConsumer checkoutConsumer = session.createConsumer(checkoutTopic);
+
+                logger.info("Setting \"checkout\" message listener...");
+                checkoutConsumer.setMessageListener(message -> {
+                    try {
+                        String json = getRawJson(message);
+                        CheckoutMessageBody parsedData = objectMapper.readValue(json, CheckoutMessageBody.class);
 
                         parsedData.process();
                     } catch (Exception e) {
