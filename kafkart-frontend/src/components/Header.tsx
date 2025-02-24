@@ -33,7 +33,7 @@ export const Header = () => {
 					<HoverCardTrigger>
 						<Avatar>
 							<AvatarImage src={profileImageUrl} />
-							<AvatarFallback>{initials}</AvatarFallback>
+							<AvatarFallback className="bg-gray-700 text-white">{initials}</AvatarFallback>
 						</Avatar>
 					</HoverCardTrigger>
 					<HoverCardContent>
