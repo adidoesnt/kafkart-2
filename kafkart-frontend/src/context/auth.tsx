@@ -13,17 +13,9 @@ type User = {
 	id: number;
 	username: string;
 	email: string;
-	profileImageUrl: string;
+	profileImageUrl?: string;
 	admin: boolean;
 };
-
-// const mockUser: User = {
-// 	id: 1,
-// 	username: "admin",
-// 	email: "admin@example.com",
-// 	profileImageUrl: "https://kafkart-bucket.s3.eu-west-2.amazonaws.com/user-images/user1.jpg",
-// 	admin: true,
-// };
 
 type AuthContextType = {
 	user: User | null;
