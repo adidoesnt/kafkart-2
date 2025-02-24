@@ -1,11 +1,14 @@
+-- Enable pgcrypto extension
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
+
 -- Teardown
 
-DROP TABLE IF EXISTS users;
-DROP TABLE IF EXISTS products;
-DROP TABLE IF EXISTS orders;
-DROP TABLE IF EXISTS order_items;
-DROP TABLE IF EXISTS payments;
-DROP TABLE IF EXISTS product_views;
+DROP TABLE IF EXISTS users CASCADE;
+DROP TABLE IF EXISTS products CASCADE;
+DROP TABLE IF EXISTS orders CASCADE;
+DROP TABLE IF EXISTS order_items CASCADE;
+DROP TABLE IF EXISTS payments CASCADE;
+DROP TABLE IF EXISTS product_views CASCADE;
 
 -- Setup
 
@@ -15,12 +18,14 @@ CREATE TABLE IF NOT EXISTS users (
     middle_name VARCHAR(255),
     last_name VARCHAR(255) NOT NULL,
     email VARCHAR(255) NOT NULL,
+    password_hash VARCHAR(1000) NOT NULL,
     phone VARCHAR(255),
     address VARCHAR(255),
     city VARCHAR(255),
     state VARCHAR(255),
     zip VARCHAR(255),
     country VARCHAR(255),
+    version INT NOT NULL DEFAULT 1,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
@@ -33,6 +38,7 @@ CREATE TABLE IF NOT EXISTS products (
     price DECIMAL(10, 2) NOT NULL,
     image VARCHAR(255),
     stock INT NOT NULL,
+    version INT NOT NULL DEFAULT 1,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
@@ -82,16 +88,15 @@ CREATE TABLE IF NOT EXISTS product_views (
 
 -- Seed
 
-INSERT INTO users (first_name, middle_name, last_name, email, phone, address, city, state, zip, country, created_at, updated_at) VALUES
-    ('Liam', 'Xavier', 'Anderson', 'liam.anderson@example.com', '555-123-4567', '742 Evergreen Terrace', 'Springfield', 'IL', '62704', 'USA', NOW(), NOW()),
-    ('Olivia', NULL, 'Brown', 'olivia.brown@example.com', '555-234-5678', '221B Baker St.', 'London', 'LDN', 'NW1 6XE', 'UK', NOW(), NOW()),
-    ('Noah', 'Zachary', 'Clark', 'noah.clark@example.com', '555-345-6789', '12 Grimmauld Place', 'London', 'LDN', 'WC1N 3XX', 'UK', NOW(), NOW()),
-    ('Emma', NULL, 'Davis', 'emma.davis@example.com', '555-456-7890', '1600 Pennsylvania Ave NW', 'Washington', 'DC', '20500', 'USA', NOW(), NOW()),
-    ('Mason', 'Vincent', 'Evans', 'mason.evans@example.com', '555-567-8901', '4 Privet Drive', 'Little Whinging', 'SRY', 'CR3 0AA', 'UK', NOW(), NOW()),
-    ('Ava', NULL, 'Foster', 'ava.foster@example.com', '555-678-9012', '10 Downing St.', 'London', 'LDN', 'SW1A 2AA', 'UK', NOW(), NOW()),
-    ('Ethan', 'Gabriel', 'Garcia', 'ethan.garcia@example.com', '555-789-0123', '31 Spooner St.', 'Quahog', 'RI', '02920', 'USA', NOW(), NOW()),
-    ('Sophia', NULL, 'Harris', 'sophia.harris@example.com', '555-890-1234', '742 Evergreen Terrace', 'Springfield', 'IL', '62704', 'USA', NOW(), NOW());
-
+INSERT INTO users (first_name, middle_name, last_name, email, phone, address, city, state, zip, country, created_at, updated_at, password_hash) VALUES
+    ('Liam', 'Xavier', 'Anderson', 'liam.anderson@example.com', '555-123-4567', '742 Evergreen Terrace', 'Springfield', 'IL', '62704', 'USA', NOW(), NOW(), crypt('password1', gen_salt('bf'))),
+    ('Olivia', NULL, 'Brown', 'olivia.brown@example.com', '555-234-5678', '221B Baker St.', 'London', 'LDN', 'NW1 6XE', 'UK', NOW(), NOW(), crypt('password2', gen_salt('bf'))),
+    ('Noah', 'Zachary', 'Clark', 'noah.clark@example.com', '555-345-6789', '12 Grimmauld Place', 'London', 'LDN', 'WC1N 3XX', 'UK', NOW(), NOW(), crypt('password3', gen_salt('bf'))),
+    ('Emma', NULL, 'Davis', 'emma.davis@example.com', '555-456-7890', '1600 Pennsylvania Ave NW', 'Washington', 'DC', '20500', 'USA', NOW(), NOW(), crypt('password4', gen_salt('bf'))),
+    ('Mason', 'Vincent', 'Evans', 'mason.evans@example.com', '555-567-8901', '4 Privet Drive', 'Little Whinging', 'SRY', 'CR3 0AA', 'UK', NOW(), NOW(), crypt('password5', gen_salt('bf'))),
+    ('Ava', NULL, 'Foster', 'ava.foster@example.com', '555-678-9012', '10 Downing St.', 'London', 'LDN', 'SW1A 2AA', 'UK', NOW(), NOW(), crypt('password6', gen_salt('bf'))),
+    ('Ethan', 'Gabriel', 'Garcia', 'ethan.garcia@example.com', '555-789-0123', '31 Spooner St.', 'Quahog', 'RI', '02920', 'USA', NOW(), NOW(), crypt('password7', gen_salt('bf'))),
+    ('Sophia', NULL, 'Harris', 'sophia.harris@example.com', '555-890-1234', '742 Evergreen Terrace', 'Springfield', 'IL', '62704', 'USA', NOW(), NOW(), crypt('password8', gen_salt('bf')));
 
 INSERT INTO products (name, short_description, description, price, image, stock, created_at, updated_at) VALUES
     ('Standard King-sized Bed', 'Luxurious and comfortable', 'A luxurious bed with a sturdy frame and a comfortable mattress.', 2000, 'https://kafkart-bucket.s3.eu-west-2.amazonaws.com/product-images/bed.jpeg', 4, NOW(), NOW()),
