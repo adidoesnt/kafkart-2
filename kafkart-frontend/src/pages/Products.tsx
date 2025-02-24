@@ -13,6 +13,7 @@ import {
 	CardHeader,
 	CardTitle,
 } from "@/components/ui/card"
+import { useCart } from "@/context/cart";
 
 export type Product = {
 	id: number;
@@ -31,9 +32,13 @@ export type ProductPopupProps = {
 };
 
 export const ProductPopup = ({ product, isOpen, setIsOpen }: ProductPopupProps) => {
+	const { addToCart } = useCart();
+	const { user } = useAuth();
+
 	const onClick = useCallback(() => {
-		console.log("Add to cart");
-	}, []);
+		addToCart(product.id, user!.id)
+		setIsOpen(false);
+	}, [addToCart, product, user, setIsOpen]);
 
 	return isOpen && (
 		<div className="absolute top-0 left-0 w-full h-full bg-black/50 flex flex-col items-center justify-center">

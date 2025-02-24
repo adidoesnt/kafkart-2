@@ -5,6 +5,7 @@ import { BrowserRouter, Route, Routes } from "react-router";
 import Products from "@/pages/Products";
 import NotFound from "@/pages/NotFound";
 import Cart from "@/pages/Cart";
+import { CartProvider } from "@/context/cart";
 
 const AuthenticatedRoutes = () => {
 	return (
@@ -32,7 +33,9 @@ export const Router = () => {
 	return (
 		<BrowserRouter>
 			{isAuthenticated ? (
-				<AuthenticatedRoutes />
+				<CartProvider>
+					<AuthenticatedRoutes />
+				</CartProvider>
 			) : (
 				<UnauthenticatedRoutes />
 			)}

@@ -1,4 +1,4 @@
-package me.adityabanerjee.kafkart_backend.cart;
+package me.adityabanerjee.kafkart_backend.orders;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Version;
