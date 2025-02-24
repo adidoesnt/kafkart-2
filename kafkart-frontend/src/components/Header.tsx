@@ -3,18 +3,25 @@ import { Link } from "react-router";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAuth } from "@/context/auth";
 import { emailToInitials } from "@/utils/avatar";
-import { useMemo } from "react";
+import { useCallback, useMemo } from "react";
 import {
 	HoverCard,
 	HoverCardContent,
 	HoverCardTrigger,
 } from "@/components/ui/hover-card";
 import { Button } from "./ui/button";
+import { useNavigate } from "react-router";
 
 export const Header = () => {
 	const { user, logout } = useAuth();
 	const profileImageUrl = useMemo(() => user!.profileImageUrl, [user]);
 	const initials = useMemo(() => emailToInitials(user!.email), [user]);
+	const navigate = useNavigate();
+
+	const onClick = useCallback(() => {
+		logout();
+		navigate("/");
+	}, [logout, navigate]);
 
 	return (
 		<div className="flex w-full h-fit justify-between items-center bg-gray-800 p-4 rounded-lg gap-8">
@@ -43,7 +50,7 @@ export const Header = () => {
 							</h2>
 							<p className="text-sm">{user!.email}</p>
 							<br />
-							<Button onClick={logout}>Logout</Button>
+							<Button onClick={onClick}>Logout</Button>
 						</div>
 					</HoverCardContent>
 				</HoverCard>
