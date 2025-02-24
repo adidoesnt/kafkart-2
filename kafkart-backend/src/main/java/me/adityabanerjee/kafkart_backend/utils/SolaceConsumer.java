@@ -1,21 +1,25 @@
 package me.adityabanerjee.kafkart_backend.utils;
 
 import com.solacesystems.jms.*;
-import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import javax.jms.*;
 import java.util.concurrent.CompletableFuture;
 
+@Component
 public class SolaceConsumer {
 
     private static final Logger logger = LoggerFactory.getLogger("SolaceConsumer");
     private Session session;
 
-    @Autowired
-    private SolaceConfig solaceConfig;
+    // TODO: Move config to application properties
+    private static final String HOST = "ws://localhost:8008";
+    private static final String USERNAME = "backend_user";
+    private static final String PASSWORD = "password";
+    private static final String VPN_NAME = "default";
+    private static final String TOPIC = "product/events";
 
     public SolaceConsumer() {
         this.session = null;
@@ -34,19 +38,21 @@ public class SolaceConsumer {
 
                 SolConnectionFactory connectionFactory = SolJmsUtility.createConnectionFactory();
 
-                connectionFactory.setHost(solaceConfig.getHost());
-                connectionFactory.setVPN(solaceConfig.getVpnName());
-                connectionFactory.setUsername(solaceConfig.getUsername());
-                connectionFactory.setPassword(solaceConfig.getPassword());
+                connectionFactory.setHost(HOST);
+                connectionFactory.setVPN(VPN_NAME);
+                connectionFactory.setUsername(USERNAME);
+                connectionFactory.setPassword(PASSWORD);
 
                 Connection connection = connectionFactory.createConnection();
                 connection.start();
 
                 session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+                logger.info("Successfully connected to Solace.");
 
-                Topic topic = session.createTopic(solaceConfig.getTopic());
+                Topic topic = session.createTopic(TOPIC);
                 MessageConsumer consumer = session.createConsumer(topic);
 
+                logger.info("Setting message listener...");
                 consumer.setMessageListener(message -> {
                     if (message instanceof TextMessage) {
                         try {
@@ -61,11 +67,12 @@ public class SolaceConsumer {
                     }
                 });
 
-                logger.info("Successfully connected to Solace.");
+                logger.info("Successfully set message listener.");
+                return session;
             } catch (Exception e) {
+                logger.error(e.getMessage());
                 throw new RuntimeException(e);
             }
-            return null;
         });
     }
 }
